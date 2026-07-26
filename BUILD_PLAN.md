@@ -249,7 +249,11 @@ revisit later, no functional blocker.
 
 - [x] Step 1 — repo skeleton (`cmd/chron`, `internal/vault`, `internal/note`, `internal/lint`)
 - [x] Step 2 — core commands (`init/new/list/ready/done/link/lint/search`)
-- [ ] Step 3 — `chronicle-vault` repo (not created yet, no GitHub remote)
+- [x] Step 3 — `chronicle-vault` repo created (private,
+      github.com/GalainDev/chronicle-vault), seeded with 7 real notes (2
+      migrated from native Claude Code memory, 4 Chronicle Candidates from
+      the 2026-07-19 handoff, 1 new Pebbles-retirement decision linked via
+      supersedes/superseded_by to the boundary note it reverses)
 - [ ] Step 4 — `chronicle` skill (`skills/` is empty)
 - [ ] Step 5 — `chron lint` in CI (no `.github/` workflows yet)
 - [ ] Step 6 — retire Pebbles (spec.md not archived, ROADMAP Phase 4 not struck,
