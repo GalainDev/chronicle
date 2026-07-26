@@ -524,7 +524,7 @@ func cmdLint(args []string) error {
 			fmt.Printf("%-12s %-30s %s\n", iss.Kind, iss.NoteID, iss.Message)
 		}
 	}
-	if len(issues) > 0 {
+	if lint.Blocking(issues) {
 		os.Exit(1)
 	}
 	return nil

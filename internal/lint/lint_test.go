@@ -138,6 +138,35 @@ func TestSpecForkedChain(t *testing.T) {
 	}
 }
 
+func TestOrphanIsNotBlocking(t *testing.T) {
+	if Blocking([]Issue{{NoteID: "decisions/foo", Kind: "orphan", Message: "not linked from any other note"}}) {
+		t.Fatal("Blocking([orphan]) = true, want false — orphan alone must not fail a build")
+	}
+}
+
+func TestRealIssuesAreBlocking(t *testing.T) {
+	cases := []string{
+		"missing_type", "invalid_type", "invalid_status", "broken_link",
+		"spec_invalid_type", "spec_capability_mismatch", "spec_bad_filename",
+		"spec_dangling_link", "spec_broken_chain",
+	}
+	for _, kind := range cases {
+		if !Blocking([]Issue{{NoteID: "x", Kind: kind, Message: "m"}}) {
+			t.Errorf("Blocking([%s]) = false, want true", kind)
+		}
+	}
+}
+
+func TestMixedIssuesAreBlocking(t *testing.T) {
+	issues := []Issue{
+		{NoteID: "a", Kind: "orphan", Message: "not linked"},
+		{NoteID: "b", Kind: "broken_link", Message: "bad link"},
+	}
+	if !Blocking(issues) {
+		t.Fatal("Blocking should be true when a real issue is mixed in with warnings")
+	}
+}
+
 func TestSpecInvalidStatus(t *testing.T) {
 	v := testVault(t)
 	if _, err := spec.New(v.SpecsDir, "oauth-login", "OAuth login v1", "work"); err != nil {

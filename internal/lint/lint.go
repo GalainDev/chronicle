@@ -23,6 +23,28 @@ type Issue struct {
 	Message string
 }
 
+// warningKinds are findings that are worth surfacing but shouldn't fail a
+// build: a standalone note isn't wrong the way a broken link or a forked
+// spec chain is. Obsidian's own graph view already renders an unlinked
+// note as an isolated dot rather than an error — chron lint mirrors that:
+// visible, not blocking. Tags are a legitimate way to make a note
+// discoverable without a specific note-to-note link, so orphan status
+// alone isn't evidence of a real problem.
+var warningKinds = map[string]bool{
+	"orphan": true,
+}
+
+// Blocking reports whether any issue should fail a build (e.g. exit
+// nonzero in CI). Warning-only kinds like "orphan" don't count.
+func Blocking(issues []Issue) bool {
+	for _, iss := range issues {
+		if !warningKinds[iss.Kind] {
+			return true
+		}
+	}
+	return false
+}
+
 // Run lints every note in v, resolving cross-vault links via reg, plus the
 // spec-driven-dev ledger under v.SpecsDir.
 func Run(v *vault.Vault, reg *vault.Registry) ([]Issue, error) {
