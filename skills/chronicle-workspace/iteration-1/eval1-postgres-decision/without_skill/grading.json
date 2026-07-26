@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "chron (the CLI) was actually invoked to create the note, not a hand-written markdown file bypassing it",
+      "passed": false,
+      "evidence": "No chron invocation. Wrote docs/decisions/2026-07-26-postgres-pool-exhaustion.md directly via a plain markdown file (expected for a no-skill baseline)."
+    },
+    {
+      "text": "The created note has type: decision in its frontmatter",
+      "passed": false,
+      "evidence": "No YAML frontmatter at all -- uses a plain 'Date:'/'Status:' text header, not machine-parseable frontmatter."
+    },
+    {
+      "text": "The note body specifically mentions the leaked connection in the retry path as the root cause",
+      "passed": true,
+      "evidence": "'Root cause' section: 'A connection leak in a retry path: when a query timed out, the retry logic re-acquired a new connection but never released the original one back to the pool.'"
+    },
+    {
+      "text": "The note body specifically mentions pgbouncer and the rationale for choosing it over raising max_connections",
+      "passed": true,
+      "evidence": "'Fix' section explicitly weighs both options and explains why pgbouncer was chosen over bumping max_connections."
+    },
+    {
+      "text": "The note is not a vague placeholder -- it captures the actual reasoning from the prompt",
+      "passed": true,
+      "evidence": "Detailed, specific writeup including a 'Reasoning to remember' section generalizing the lesson."
+    }
+  ],
+  "summary": { "passed": 3, "failed": 2, "total": 5, "pass_rate": 0.6 }
+}

@@ -1,0 +1,33 @@
+{
+  "expectations": [
+    {
+      "text": "The already-implemented spec file's original content was NOT modified/rewritten in place",
+      "passed": true,
+      "evidence": "v1's '# OAuth login with Google, GitHub, and refresh token rotation' / '## Requirements' body is untouched; only frontmatter status/superseded_by/updated changed."
+    },
+    {
+      "text": "chron spec revise was invoked (not a manual edit of the implemented file, not chron spec new on a fresh capability name)",
+      "passed": true,
+      "evidence": "Agent report: 'Ran chron spec revise oauth-login ...' -- discovered and used the CLI's own lifecycle commands without being taught the skill."
+    },
+    {
+      "text": "The new version's frontmatter has status: proposed and supersedes pointing at the previous (implemented) version",
+      "passed": true,
+      "evidence": "v2 frontmatter: 'status: proposed', 'supersedes: oauth-login/v1-oauth-login-with-google-github-and-refresh-token-rotation'."
+    },
+    {
+      "text": "The new version's requirements are a full self-contained snapshot including Apple Sign-In, not just a diff/delta noting the addition",
+      "passed": false,
+      "evidence": "v2's Requirements section reads: 'Google and GitHub OAuth login, plus refresh token rotation -- shipped in [[v1]], live in prod. No further work needed here.' plus one new bullet for Apple Sign-In. This is a delta note pointing back at v1, not a full restated snapshot of all current requirements -- exactly the OpenSpec-style delta format the design explicitly rejected in favor of full snapshots. A baseline agent without the skill correctly used chron spec revise mechanically but missed this specific content convention, since it isn't encoded in the CLI's own --help text -- only in format/SPEC.md and the skill."
+    },
+    {
+      "text": "The previous version's status became superseded and its superseded_by field points at the new version",
+      "passed": true,
+      "evidence": "v1 frontmatter: 'status: superseded', 'superseded_by: oauth-login/v2-oauth-login-with-google-github-apple-sign-in-and-refresh-token-rotation'."
+    }
+  ],
+  "summary": { "passed": 4, "failed": 1, "total": 5, "pass_rate": 0.8 },
+  "notes": [
+    "Important finding: the chron CLI is discoverable enough on its own that a baseline agent (no skill) correctly found and used chron spec revise, and correctly avoided hand-editing the implemented v1 file, without ever being taught this. The skill's differentiating value on THIS eval is narrower than expected -- it isn't 'use revise, not a manual edit' (baseline got that right anyway), it's the full-snapshot-not-delta content convention, which only lives in format/SPEC.md / the skill, not in the CLI's usage text."
+  ]
+}

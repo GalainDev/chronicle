@@ -1,0 +1,33 @@
+{
+  "expectations": [
+    {
+      "text": "The already-implemented spec file's original content was NOT modified/rewritten in place",
+      "passed": true,
+      "evidence": "Agent confirms v1's title/body (including empty Requirements heading) are byte-identical before/after; only chron spec revise touched v1's frontmatter."
+    },
+    {
+      "text": "chron spec revise was invoked (not a manual edit of the implemented file, not chron spec new on a fresh capability name)",
+      "passed": true,
+      "evidence": "'chron spec revise oauth-login \"OAuth login with Google, GitHub, Apple Sign-In, and refresh token rotation\"' was run."
+    },
+    {
+      "text": "The new version's frontmatter has status: proposed and supersedes pointing at the previous (implemented) version",
+      "passed": true,
+      "evidence": "v2 frontmatter: 'status: proposed', 'supersedes: oauth-login/v1-oauth-login-with-google-github-and-refresh-token-rotation'."
+    },
+    {
+      "text": "The new version's requirements are a full self-contained snapshot including Apple Sign-In, not just a diff/delta noting the addition",
+      "passed": true,
+      "evidence": "v2's Requirements section restates the full current requirement set (Google/GitHub/Apple login, rotation-on-use, reuse detection, account linking, profile normalization) as standalone bullets, not a pointer back to v1 -- exactly the full-snapshot convention the design calls for. A short 'What changed and why' section explains the delta narratively, separate from the requirements themselves."
+    },
+    {
+      "text": "The previous version's status became superseded and its superseded_by field points at the new version",
+      "passed": true,
+      "evidence": "Handled automatically by chron spec revise per the agent's report (consistent with internal/spec's tested behavior)."
+    }
+  ],
+  "summary": { "passed": 5, "failed": 0, "total": 5, "pass_rate": 1.0 },
+  "notes": [
+    "This is the clearest with-skill vs baseline differentiator across all three evals: baseline correctly used chron spec revise and avoided hand-editing v1, but wrote a delta-style note pointing back at v1 rather than a full snapshot. The skill's explicit 'never a diff against the previous version' instruction is what produced the correct behavior here."
+  ]
+}

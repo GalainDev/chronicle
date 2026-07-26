@@ -112,6 +112,23 @@ If you find yourself about to edit a `status: implemented` (or
 `superseded`) spec file directly: stop, that's the immutability rule being
 violated — use `chron spec revise` instead, even for a trivial correction.
 
+**The full-snapshot rule is easy to get technically right but
+substantively wrong** — using `chron spec revise` correctly (not
+hand-editing the old file) still isn't enough if the new version's
+Requirements section just points back at the old one instead of restating
+it. Concretely, if v1 covered Google + GitHub login and product adds Apple
+Sign-In:
+
+- **Wrong** (delta, leans on the reader following a link to know what's
+  actually true): `"Google and GitHub login shipped in [[v1]], live in
+  prod, no further work needed here. New: add Apple Sign-In."`
+- **Right** (full snapshot, self-contained — a reader shouldn't need to
+  open v1 to know the current requirements): restate Google login, GitHub
+  login, *and* Apple Sign-In as full peer requirements in v2's body. A
+  short prose note on *why* the change happened is fine and useful
+  alongside this — but it supplements the full requirement list, it
+  doesn't replace restating any of it.
+
 ## Edge cases
 
 - **`chron` not installed**: read/write the markdown by hand, following

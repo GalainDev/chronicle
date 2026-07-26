@@ -1,0 +1,126 @@
+{
+  "metadata": {
+    "skill_name": "chronicle",
+    "skill_path": "/Users/heman/developer/chronicle/skills/chronicle",
+    "executor_model": "claude-sonnet-5",
+    "analyzer_model": "claude-sonnet-5",
+    "timestamp": "2026-07-26T18:35:00Z",
+    "evals_run": [1, 2, 3],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval1-postgres-decision",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5, "time_seconds": 76.772, "tokens": 32182, "tool_calls": 11, "errors": 0 },
+      "expectations": [
+        {"text": "chron (the CLI) was actually invoked to create the note, not a hand-written markdown file bypassing it", "passed": true, "evidence": "chron init then chron new decision was used"},
+        {"text": "The created note has type: decision in its frontmatter", "passed": true, "evidence": "Frontmatter: type: decision"},
+        {"text": "Mentions leaked connection in retry path as root cause", "passed": true, "evidence": "Problem section names the exact mechanism"},
+        {"text": "Mentions pgbouncer + rationale over raising max_connections", "passed": true, "evidence": "Rationale section explicitly contrasts both options"},
+        {"text": "Not a vague placeholder", "passed": true, "evidence": "Detailed Problem/Decision/Rationale/Follow-up structure"}
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval1-postgres-decision",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 0.6, "passed": 3, "failed": 2, "total": 5, "time_seconds": 41.072, "tokens": 26295, "tool_calls": 5, "errors": 0 },
+      "expectations": [
+        {"text": "chron (the CLI) was actually invoked to create the note, not a hand-written markdown file bypassing it", "passed": false, "evidence": "Wrote docs/decisions/*.md directly, no chron"},
+        {"text": "The created note has type: decision in its frontmatter", "passed": false, "evidence": "No YAML frontmatter at all"},
+        {"text": "Mentions leaked connection in retry path as root cause", "passed": true, "evidence": "Root cause section names it"},
+        {"text": "Mentions pgbouncer + rationale over raising max_connections", "passed": true, "evidence": "Fix section weighs both options"},
+        {"text": "Not a vague placeholder", "passed": true, "evidence": "Thorough writeup with a 'reasoning to remember' section"}
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval2-oauth-spec",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5, "time_seconds": 106.320, "tokens": 36524, "tool_calls": 14, "errors": 0 },
+      "expectations": [
+        {"text": "chron spec new was actually invoked, creating a v1 file under specs/<capability>/", "passed": true, "evidence": "chron spec new oauth-login created v1"},
+        {"text": "The resulting spec has status: proposed in its frontmatter", "passed": true, "evidence": "status: proposed"},
+        {"text": "Requirements substantively cover Google, GitHub, refresh rotation", "passed": true, "evidence": "Detailed per-provider + token handling sections"},
+        {"text": "No type: task note created as primary artifact", "passed": true, "evidence": "Only notes/index.md + specs/oauth-login/v1 exist"},
+        {"text": "Capability name reasonable", "passed": true, "evidence": "oauth-login, explicitly justified"}
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval2-oauth-spec",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 0.6, "passed": 3, "failed": 2, "total": 5, "time_seconds": 68.549, "tokens": 29006, "tool_calls": 3, "errors": 0 },
+      "expectations": [
+        {"text": "chron spec new was actually invoked, creating a v1 file under specs/<capability>/", "passed": false, "evidence": "Wrote OAUTH_SPEC.md at repo root, no chron"},
+        {"text": "The resulting spec has status: proposed in its frontmatter", "passed": false, "evidence": "No frontmatter, plain markdown doc"},
+        {"text": "Requirements substantively cover Google, GitHub, refresh rotation", "passed": true, "evidence": "Very thorough design doc"},
+        {"text": "No type: task note created as primary artifact", "passed": true, "evidence": "Only OAUTH_SPEC.md created"},
+        {"text": "Capability name reasonable", "passed": true, "evidence": "Document is unambiguously OAuth-scoped"}
+      ],
+      "notes": ["Baseline doc is arguably higher-detail prose, but lacks the structural conventions (chron, frontmatter, capability-scoped ledger placement) that make it durable/queryable later"]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval3-revise-spec",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5, "time_seconds": 109.399, "tokens": 40623, "tool_calls": 17, "errors": 0 },
+      "expectations": [
+        {"text": "v1 content NOT modified/rewritten in place", "passed": true, "evidence": "Byte-identical title/body before and after; only chron touched frontmatter"},
+        {"text": "chron spec revise was invoked", "passed": true, "evidence": "chron spec revise oauth-login ... was run"},
+        {"text": "New version status: proposed, supersedes previous", "passed": true, "evidence": "supersedes: oauth-login/v1-..."},
+        {"text": "Full self-contained snapshot including Apple Sign-In, not a delta", "passed": true, "evidence": "Requirements restate the full current set as standalone bullets, not a pointer back to v1"},
+        {"text": "Previous version superseded, superseded_by points at new version", "passed": true, "evidence": "Handled automatically by chron spec revise"}
+      ],
+      "notes": ["Clearest with-skill vs baseline differentiator across all 3 evals"]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval3-revise-spec",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 0.8, "passed": 4, "failed": 1, "total": 5, "time_seconds": 68.380, "tokens": 29426, "tool_calls": 12, "errors": 0 },
+      "expectations": [
+        {"text": "v1 content NOT modified/rewritten in place", "passed": true, "evidence": "Confirmed untouched, only chron changed frontmatter"},
+        {"text": "chron spec revise was invoked", "passed": true, "evidence": "Baseline discovered and used chron spec revise on its own"},
+        {"text": "New version status: proposed, supersedes previous", "passed": true, "evidence": "supersedes: oauth-login/v1-..."},
+        {"text": "Full self-contained snapshot including Apple Sign-In, not a delta", "passed": false, "evidence": "Requirements read 'shipped in v1, live in prod, no further work needed here' plus one new bullet -- a delta note, not a full snapshot"},
+        {"text": "Previous version superseded, superseded_by points at new version", "passed": true, "evidence": "v1 frontmatter confirms both fields"}
+      ],
+      "notes": ["Important finding: chron is discoverable enough that baseline correctly used chron spec revise and avoided hand-editing v1 without ever being taught this -- the skill's real differentiating value here is narrower than expected: the full-snapshot-not-delta convention, which only lives in format/SPEC.md and the skill, not the CLI's own --help text"]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0},
+      "time_seconds": {"mean": 97.497, "stddev": 14.71, "min": 76.772, "max": 109.399},
+      "tokens": {"mean": 36443, "stddev": 3446.5, "min": 32182, "max": 40623}
+    },
+    "without_skill": {
+      "pass_rate": {"mean": 0.667, "stddev": 0.094, "min": 0.6, "max": 0.8},
+      "time_seconds": {"mean": 59.334, "stddev": 12.91, "min": 41.072, "max": 68.549},
+      "tokens": {"mean": 28242, "stddev": 1387.6, "min": 26295, "max": 29426}
+    },
+    "delta": {
+      "pass_rate": "+0.333",
+      "time_seconds": "+38.16",
+      "tokens": "+8201"
+    }
+  },
+  "notes": [
+    "The skill produces a 100% vs 66.7% mean pass rate across 3 evals, but every failure on the baseline side is a *structural* miss (no chron invocation, no frontmatter, or a delta-style spec instead of a full snapshot) -- baseline content quality/thoroughness was consistently good or even more verbose. The skill's value here is specifically the durable/machine-queryable conventions, not raw writing quality.",
+    "Eval 3's baseline result is the most interesting data point: chron's own CLI is discoverable enough that an agent with no skill guidance still found and correctly used chron spec revise, and correctly avoided hand-editing the implemented v1 file. This means the skill isn't teaching 'use revise, not a manual edit' as much as expected -- its real differentiating contribution on this eval is the full-snapshot-vs-delta content convention specifically.",
+    "Only 1 run per configuration (not the usual 3) -- stddev values here reflect variance ACROSS the 3 different evals, not repeated runs of the same eval, so they're not directly comparable to a true within-eval variance measurement. Treat this as a single-pass smoke benchmark, not a statistically robust result.",
+    "Skill adds meaningful token/time overhead (+8.2k tokens, +38s mean) in exchange for the structural pass-rate gain -- expected, since the skill instructs additional steps (vault resolution check, lint run) baseline runs skip entirely."
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "chron spec new was actually invoked, creating a v1 file under specs/<capability>/",
+      "passed": true,
+      "evidence": "'chron spec new oauth-login \"OAuth login with Google and GitHub, refresh token rotation\"' created specs/oauth-login/v1-oauth-login-with-google-and-github-refresh-token-rotation.md."
+    },
+    {
+      "text": "The resulting spec has status: proposed in its frontmatter",
+      "passed": true,
+      "evidence": "Reported frontmatter: 'status: proposed'."
+    },
+    {
+      "text": "The spec's Requirements section substantively covers Google OAuth, GitHub OAuth, and refresh token rotation -- not left as a bare template heading",
+      "passed": true,
+      "evidence": "Requirements cover provider integration detail for both Google (OIDC/PKCE) and GitHub (OAuth2 + separate email fetch), plus a detailed token-handling section (rotation on every use, reuse detection, family revocation)."
+    },
+    {
+      "text": "No type: task note was created as the primary tracking mechanism for this work (the spec itself is the plan, per the skill's design)",
+      "passed": true,
+      "evidence": "Output directory contains only notes/index.md and specs/oauth-login/v1-...md -- no tasks/ directory or task note exists."
+    },
+    {
+      "text": "The capability name chosen is reasonable (e.g. oauth-login, oauth, auth) rather than something unrelated to OAuth",
+      "passed": true,
+      "evidence": "Capability named 'oauth-login', explicitly justified as treating Google+GitHub+rotation as one cohesive capability."
+    }
+  ],
+  "summary": { "passed": 5, "failed": 0, "total": 5, "pass_rate": 1.0 }
+}

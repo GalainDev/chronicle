@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "chron (the CLI) was actually invoked to create the note, not a hand-written markdown file bypassing it",
+      "passed": true,
+      "evidence": "chron init then chron new decision \"...\" --area work was used to scaffold the note; body edited afterward."
+    },
+    {
+      "text": "The created note has type: decision in its frontmatter",
+      "passed": true,
+      "evidence": "Frontmatter: 'type: decision'."
+    },
+    {
+      "text": "The note body specifically mentions the leaked connection in the retry path as the root cause",
+      "passed": true,
+      "evidence": "'Problem' section: 'a retry path leaked a connection whenever a query hit a timeout -- the retry logic re-issued the query on a new connection without releasing the original one back to the pool.'"
+    },
+    {
+      "text": "The note body specifically mentions pgbouncer and the rationale for choosing it over raising max_connections",
+      "passed": true,
+      "evidence": "'Rationale' section explicitly contrasts pgbouncer against raising max_connections, explaining the latter 'treats the symptom, not the cause.'"
+    },
+    {
+      "text": "The note is not a vague placeholder -- it captures the actual reasoning from the prompt",
+      "passed": true,
+      "evidence": "Detailed Problem/Decision/Rationale/Follow-up structure with specific technical reasoning."
+    }
+  ],
+  "summary": { "passed": 5, "failed": 0, "total": 5, "pass_rate": 1.0 }
+}

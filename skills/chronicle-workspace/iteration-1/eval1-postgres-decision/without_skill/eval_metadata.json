@@ -1,0 +1,32 @@
+{
+  "eval_id": 1,
+  "eval_name": "eval1-postgres-decision",
+  "prompt": "I just spent an hour tracking down why our Postgres connection pool kept maxing out under load \u2014 turns out we had a leaked connection in a retry path that only fired on timeout. We fixed it by switching to pgbouncer instead of just bumping max_connections, since bumping the limit would've just delayed the same problem. Can you note this down so we don't lose the reasoning?",
+  "assertions": [
+    {
+      "text": "chron (the CLI) was actually invoked to create the note, not a hand-written markdown file bypassing it",
+      "passed": null,
+      "evidence": ""
+    },
+    {
+      "text": "The created note has type: decision in its frontmatter",
+      "passed": null,
+      "evidence": ""
+    },
+    {
+      "text": "The note body specifically mentions the leaked connection in the retry path as the root cause",
+      "passed": null,
+      "evidence": ""
+    },
+    {
+      "text": "The note body specifically mentions pgbouncer and the rationale for choosing it over raising max_connections",
+      "passed": null,
+      "evidence": ""
+    },
+    {
+      "text": "The note is not a vague placeholder (e.g. 'Fixed a Postgres bug') \u2014 it captures the actual reasoning from the prompt",
+      "passed": null,
+      "evidence": ""
+    }
+  ]
+}

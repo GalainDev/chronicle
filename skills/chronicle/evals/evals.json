@@ -1,0 +1,44 @@
+{
+  "skill_name": "chronicle",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I just spent an hour tracking down why our Postgres connection pool kept maxing out under load — turns out we had a leaked connection in a retry path that only fired on timeout. We fixed it by switching to pgbouncer instead of just bumping max_connections, since bumping the limit would've just delayed the same problem. Can you note this down so we don't lose the reasoning?",
+      "expected_output": "A `type: decision` note created via `chron new decision \"...\"` in the resolved vault, capturing the actual root cause (leaked connection in the retry path) and the rationale for pgbouncer over raising max_connections (treats the cause, not the symptom) — not a generic 'we fixed a bug' note. Uses chron rather than a hand-written markdown file.",
+      "files": [],
+      "expectations": [
+        "chron (the CLI) was actually invoked to create the note, not a hand-written markdown file bypassing it",
+        "The created note has type: decision in its frontmatter",
+        "The note body specifically mentions the leaked connection in the retry path as the root cause",
+        "The note body specifically mentions pgbouncer and the rationale for choosing it over raising max_connections",
+        "The note is not a vague placeholder (e.g. 'Fixed a Postgres bug') — it captures the actual reasoning from the prompt"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "We're about to build OAuth login for this app — should support both Google and GitHub, with refresh token rotation. Before any of us start writing code, can you set up a spec for it?",
+      "expected_output": "A capability spec created via `chron spec new oauth-login \"...\"` (or similar capability name), status proposed, with a Requirements section actually covering Google + GitHub OAuth and refresh token rotation — not left as an empty template. Does not create a `type: task` note as the primary artifact for this work.",
+      "files": [],
+      "expectations": [
+        "chron spec new was actually invoked, creating a v1 file under specs/<capability>/",
+        "The resulting spec has status: proposed in its frontmatter",
+        "The spec's Requirements section substantively covers Google OAuth, GitHub OAuth, and refresh token rotation — not left as a bare template heading",
+        "No type: task note was created as the primary tracking mechanism for this work (the spec itself is the plan, per the skill's design)",
+        "The capability name chosen is reasonable (e.g. oauth-login, oauth, auth) rather than something unrelated to OAuth"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Ok we just shipped the refresh-token-rotation part of OAuth login and it's fully working in prod. Requirements actually changed partway through though -- product decided we also need to support Apple Sign-In now, which wasn't in scope when we started. What should we do about the spec?",
+      "expected_output": "Recognizes the capability was already implemented (chron spec current shows status: implemented) and does NOT hand-edit that file to add Apple Sign-In. Instead uses `chron spec revise` to create a new version with the updated requirements (Google + GitHub + Apple + refresh rotation), which supersedes the implemented one.",
+      "files": ["evals/fixtures/oauth-implemented"],
+      "expectations": [
+        "The already-implemented spec file's original content was NOT modified/rewritten in place",
+        "chron spec revise was invoked (not a manual edit of the implemented file, not chron spec new on a fresh capability name)",
+        "The new version's frontmatter has status: proposed and supersedes pointing at the previous (implemented) version",
+        "The new version's requirements are a full self-contained snapshot including Apple Sign-In, not just a diff/delta noting the addition",
+        "The previous version's status became superseded and its superseded_by field points at the new version"
+      ]
+    }
+  ]
+}

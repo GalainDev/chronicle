@@ -1,0 +1,32 @@
+{
+  "eval_id": 2,
+  "eval_name": "eval2-oauth-spec",
+  "prompt": "We're about to build OAuth login for this app \u2014 should support both Google and GitHub, with refresh token rotation. Before any of us start writing code, can you set up a spec for it?",
+  "assertions": [
+    {
+      "text": "chron spec new was actually invoked, creating a v1 file under specs/<capability>/",
+      "passed": null,
+      "evidence": ""
+    },
+    {
+      "text": "The resulting spec has status: proposed in its frontmatter",
+      "passed": null,
+      "evidence": ""
+    },
+    {
+      "text": "The spec's Requirements section substantively covers Google OAuth, GitHub OAuth, and refresh token rotation \u2014 not left as a bare template heading",
+      "passed": null,
+      "evidence": ""
+    },
+    {
+      "text": "No type: task note was created as the primary tracking mechanism for this work (the spec itself is the plan, per the skill's design)",
+      "passed": null,
+      "evidence": ""
+    },
+    {
+      "text": "The capability name chosen is reasonable (e.g. oauth-login, oauth, auth) rather than something unrelated to OAuth",
+      "passed": null,
+      "evidence": ""
+    }
+  ]
+}

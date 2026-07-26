@@ -1,0 +1,33 @@
+{
+  "expectations": [
+    {
+      "text": "chron spec new was actually invoked, creating a v1 file under specs/<capability>/",
+      "passed": false,
+      "evidence": "No chron invocation at all. Wrote a standalone OAUTH_SPEC.md at the repo root instead (expected for a no-skill baseline -- chron was never mentioned or discovered in this run's repo, unlike eval3's baseline which had an existing .chronicle/ to find)."
+    },
+    {
+      "text": "The resulting spec has status: proposed in its frontmatter",
+      "passed": false,
+      "evidence": "OAUTH_SPEC.md has no YAML frontmatter of any kind -- it's a plain markdown design doc with prose headings only."
+    },
+    {
+      "text": "The spec's Requirements section substantively covers Google OAuth, GitHub OAuth, and refresh token rotation -- not left as a bare template heading",
+      "passed": true,
+      "evidence": "Extremely thorough -- covers protocol detail, data model, refresh rotation algorithm with reuse detection, API endpoints, security requirements for both providers."
+    },
+    {
+      "text": "No type: task note was created as the primary tracking mechanism for this work (the spec itself is the plan, per the skill's design)",
+      "passed": true,
+      "evidence": "Only OAUTH_SPEC.md was created -- no separate task-tracking artifact."
+    },
+    {
+      "text": "The capability name chosen is reasonable (e.g. oauth-login, oauth, auth) rather than something unrelated to OAuth",
+      "passed": true,
+      "evidence": "Not applicable in the chron sense (no capability field exists), but the document is unambiguously and entirely about OAuth login."
+    }
+  ],
+  "summary": { "passed": 3, "failed": 2, "total": 5, "pass_rate": 0.6 },
+  "notes": [
+    "The baseline document is arguably higher-detail prose than the with-skill version (full data model, endpoint table, rollout plan) -- the skill isn't adding writing quality, it's adding the structural conventions (chron usage, frontmatter, capability-scoped ledger placement) that make the content durable/discoverable/machine-queryable later, which a one-off OAUTH_SPEC.md file is not."
+  ]
+}

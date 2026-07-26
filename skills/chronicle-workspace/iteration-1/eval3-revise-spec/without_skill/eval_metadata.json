@@ -1,0 +1,32 @@
+{
+  "eval_id": 3,
+  "eval_name": "eval3-revise-spec",
+  "prompt": "Ok we just shipped the refresh-token-rotation part of OAuth login and it's fully working in prod. Requirements actually changed partway through though -- product decided we also need to support Apple Sign-In now, which wasn't in scope when we started. What should we do about the spec?",
+  "assertions": [
+    {
+      "text": "The already-implemented spec file's original content was NOT modified/rewritten in place",
+      "passed": null,
+      "evidence": ""
+    },
+    {
+      "text": "chron spec revise was invoked (not a manual edit of the implemented file, not chron spec new on a fresh capability name)",
+      "passed": null,
+      "evidence": ""
+    },
+    {
+      "text": "The new version's frontmatter has status: proposed and supersedes pointing at the previous (implemented) version",
+      "passed": null,
+      "evidence": ""
+    },
+    {
+      "text": "The new version's requirements are a full self-contained snapshot including Apple Sign-In, not just a diff/delta noting the addition",
+      "passed": null,
+      "evidence": ""
+    },
+    {
+      "text": "The previous version's status became superseded and its superseded_by field points at the new version",
+      "passed": null,
+      "evidence": ""
+    }
+  ]
+}
