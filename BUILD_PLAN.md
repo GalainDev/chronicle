@@ -254,9 +254,12 @@ revisit later, no functional blocker.
       migrated from native Claude Code memory, 4 Chronicle Candidates from
       the 2026-07-19 handoff, 1 new Pebbles-retirement decision linked via
       supersedes/superseded_by to the boundary note it reverses)
-- [~] Step 4 — `chronicle` skill written (`skills/chronicle/SKILL.md`,
-      covers vault resolution, second-brain read/write, spec-driven-dev
-      lifecycle). Not yet run through skill-creator's graded eval loop
+- [x] Step 4 — `chronicle` skill written and run through skill-creator's
+      eval loop: 100% pass rate with-skill vs 66.7% baseline across 3
+      evals (single-pass smoke benchmark, not a statistically robust
+      result). Strengthened the full-snapshot-not-delta rule with a
+      concrete example based on the one gap found. Workspace/benchmark
+      committed at `skills/chronicle-workspace/iteration-1/`
 - [ ] Step 5 — `chron lint` in CI (no `.github/` workflows yet)
 - [ ] Step 6 — retire Pebbles (spec.md not archived, ROADMAP Phase 4 not struck,
       AI/README.md sibling table not updated)
