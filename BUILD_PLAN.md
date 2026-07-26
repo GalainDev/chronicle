@@ -257,8 +257,12 @@ revisit later, no functional blocker.
 - [ ] Step 7 — evals (`evals/` is empty)
 - [ ] Step 8 — global instruction wiring (no chronicle mention in `~/.claude/CLAUDE.md`)
 - N/A Step 9 — explicitly left as-is, no action needed
-- [~] Spec-driven dev (added 2026-07-27): `type: spec` note type,
-      `internal/spec` (unit-tested), and `chron spec
-      new/revise/implement/current/history/list` CLI commands all done and
-      smoke-tested end to end. Still pending: `chron lint` spec rules
-      (capability/link integrity, flag edits to implemented specs)
+- [x] Spec-driven dev (added 2026-07-27): `type: spec` note type,
+      `internal/spec` (unit-tested), `chron spec
+      new/revise/implement/current/history/list` CLI commands, and
+      `chron lint` spec rules (capability/filename consistency, dangling
+      links, broken/forked chains) — all done, tested, smoke-tested end to
+      end. Not done: git-diff-based detection of content edits to an
+      already-implemented spec (flagged as best-effort/stretch in the
+      original design; skipped for v1 — nothing currently stops a manual
+      edit to a frozen spec file other than convention)
