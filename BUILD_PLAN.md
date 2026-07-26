@@ -169,6 +169,82 @@ visually once notes exist; revisit only if `chron` itself needs to answer
   baselines — this is the evidence gate before calling Chronicle "done"
   per the standing "skills earn their context through evals" rule.
 
+## Spec-driven development (added 2026-07-27)
+
+Chronicle is both things at once: a general **second brain** (durable
+knowledge across sessions/topics — decisions, runbooks, preferences, work
+progress, study notes; Obsidian-like, not repo-scoped) and a **spec-driven
+development tool** for repo-level deltas (specs stay in the project repo,
+give a history of decision-making, OKF format throughout — renderable in
+Obsidian today, a future Chronicle web app later; CLI only for now).
+
+**Model: ledger, not mutation.** OpenSpec mutates a capability's `spec.md`
+in place via ADDED/MODIFIED/REMOVED delta sections, with change proposals
+archived separately. Chronicle does not do this — it fits Chronicle's
+existing DNA better (decisions already don't get rewritten; reversals are
+recorded as new decisions, e.g. the Pebbles-retirement note) to make specs
+immutable once implemented. A capability's spec never gets edited after
+`status: implemented`; a later change writes a *new* spec version that
+supersedes it. "Current truth" = walk the chain to the tip with no
+`superseded_by`. "History of decision-making" = walk the chain backward —
+free, from the links, no separate changelog needed.
+
+**Full snapshot per version, not deltas.** Each spec version is a complete,
+self-contained set of requirements plus a short prose note on what changed
+and why (same style as ROADMAP.md's dated decision entries) — not an
+OpenSpec-style ADDED/MODIFIED/REMOVED diff against the previous version.
+Simpler to render (no delta-application logic, ever, not even manual), and
+consistent with how this project already writes decision narrative.
+
+**No separate task tracker for spec-driven work.** A `proposed` spec IS the
+plan; the agent implements directly from it. `type: task` still exists for
+second-brain use (personal to-dos, study progress) but is not the mechanism
+for repo feature work once a spec exists for it.
+
+**Frontmatter (`type: spec`):**
+```yaml
+type: spec
+capability: oauth-login
+status: proposed        # proposed | implemented | superseded
+supersedes: [[oauth-login-v1]]      # omitted on the first version
+superseded_by: [[oauth-login-v3]]   # added later; metadata-only touch on
+                                     # an old file, not a content rewrite
+area: work
+tags: [auth]
+```
+
+**`supersedes`/`superseded_by` scope:** defined generally in the OKF format
+(any note type may use them as plain wiki-links — e.g. a `decision` noting
+it reverses an earlier one) but `chron` only *resolves* the chain for
+`spec`. Specs have `capability:` as an unambiguous grouping key, so "find
+the current tip for capability X" is a well-defined query `chron` can
+compute. Other types have no equivalent forced grouping, so the same field
+names on them are inert narrative links, not something `chron` walks or
+enforces.
+
+**Layout — capability-scoped folders**, per-repo only (never in the global
+`chronicle-vault` — specs are inherently repo-scoped):
+```
+.chronicle/specs/oauth-login/
+  v1-initial.md        (status: superseded, superseded_by: v2)
+  v2-add-refresh.md    (status: implemented, current tip)
+```
+
+**New commands:**
+- `chron spec new <capability> "title"` — scaffold v1, `status: proposed`
+- `chron spec revise <capability> "title"` — new version superseding the
+  current tip (whichever status the tip is in)
+- `chron spec implement <capability>` — flip the tip to `status:
+  implemented`; freezes its content going forward
+- `chron spec current <capability>` — resolve and show the tip
+- `chron spec history <capability>` — walk the chain backward
+- `chron lint` extended: capability folder/filename consistency,
+  supersedes/superseded_by link integrity, and (best-effort) flag content
+  changes to a file already marked `implemented`
+
+**Open/deferred:** naming for the project itself ("Chronicle") — tabled,
+revisit later, no functional blocker.
+
 ## Progress (updated 2026-07-26)
 
 - [x] Step 1 — repo skeleton (`cmd/chron`, `internal/vault`, `internal/note`, `internal/lint`)
@@ -181,3 +257,7 @@ visually once notes exist; revisit only if `chron` itself needs to answer
 - [ ] Step 7 — evals (`evals/` is empty)
 - [ ] Step 8 — global instruction wiring (no chronicle mention in `~/.claude/CLAUDE.md`)
 - N/A Step 9 — explicitly left as-is, no action needed
+- [ ] Spec-driven dev (added 2026-07-27): `type: spec` note type,
+      `internal/spec` (chain resolution/immutability), `chron spec
+      new/revise/implement/current/history` commands, `chron lint` spec
+      rules — not started
