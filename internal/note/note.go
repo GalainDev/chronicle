@@ -16,10 +16,15 @@ import (
 )
 
 // Types is the fixed set of valid `type` values.
-var Types = []string{"decision", "task", "runbook", "reference", "preference", "project"}
+var Types = []string{"decision", "task", "runbook", "reference", "preference", "project", "spec"}
 
 // TaskStatuses is the fixed set of valid `status` values for type: task notes.
 var TaskStatuses = []string{"open", "in_progress", "blocked", "done", "deferred"}
+
+// SpecStatuses is the fixed set of valid `status` values for type: spec notes.
+// A spec's content is immutable once it leaves "proposed" — a later change
+// creates a new version (via chron spec revise) rather than editing this one.
+var SpecStatuses = []string{"proposed", "implemented", "superseded"}
 
 func validType(t string) bool {
 	for _, v := range Types {
@@ -33,17 +38,20 @@ func validType(t string) bool {
 // Frontmatter is the fixed schema for a Chronicle note. Every field maps to
 // one YAML-ish `key: value` line; list fields use `[a, b, c]` inline syntax.
 type Frontmatter struct {
-	Type        string // required: decision|task|runbook|reference|preference|project
-	Area        string // work|study|personal, optional
-	Tags        []string
-	Status      string // task only: open|in_progress|blocked|done|deferred
-	Priority    string // task only: 0-3
-	Blocks      []string
-	BlockedBy   []string
-	Created     string
-	Updated     string
-	Closed      string
-	CloseReason string
+	Type         string // required: decision|task|runbook|reference|preference|project|spec
+	Capability   string // spec only: the capability this version belongs to
+	Area         string // work|study|personal, optional
+	Tags         []string
+	Status       string // task: open|in_progress|blocked|done|deferred; spec: proposed|implemented|superseded
+	Priority     string // task only: 0-3
+	Supersedes   string // wiki-link to the previous version, if any (spec-resolved; other types: narrative only)
+	SupersededBy string // wiki-link to the version that replaced this one (spec-resolved; other types: narrative only)
+	Blocks       []string
+	BlockedBy    []string
+	Created      string
+	Updated      string
+	Closed       string
+	CloseReason  string
 }
 
 // Note is a parsed Chronicle note file.
@@ -56,7 +64,8 @@ type Note struct {
 }
 
 var fieldOrder = []string{
-	"type", "area", "tags", "status", "priority", "blocks", "blocked_by",
+	"type", "capability", "area", "tags", "status", "priority",
+	"supersedes", "superseded_by", "blocks", "blocked_by",
 	"created", "updated", "closed", "close_reason",
 }
 
@@ -64,6 +73,8 @@ func (fm Frontmatter) get(key string) (string, []string, bool) {
 	switch key {
 	case "type":
 		return fm.Type, nil, fm.Type != ""
+	case "capability":
+		return fm.Capability, nil, fm.Capability != ""
 	case "area":
 		return fm.Area, nil, fm.Area != ""
 	case "tags":
@@ -72,6 +83,10 @@ func (fm Frontmatter) get(key string) (string, []string, bool) {
 		return fm.Status, nil, fm.Status != ""
 	case "priority":
 		return fm.Priority, nil, fm.Priority != ""
+	case "supersedes":
+		return fm.Supersedes, nil, fm.Supersedes != ""
+	case "superseded_by":
+		return fm.SupersededBy, nil, fm.SupersededBy != ""
 	case "blocks":
 		return "", fm.Blocks, len(fm.Blocks) > 0
 	case "blocked_by":
@@ -92,6 +107,8 @@ func (fm *Frontmatter) set(key, scalar string, list []string) {
 	switch key {
 	case "type":
 		fm.Type = scalar
+	case "capability":
+		fm.Capability = scalar
 	case "area":
 		fm.Area = scalar
 	case "tags":
@@ -100,6 +117,10 @@ func (fm *Frontmatter) set(key, scalar string, list []string) {
 		fm.Status = scalar
 	case "priority":
 		fm.Priority = scalar
+	case "supersedes":
+		fm.Supersedes = scalar
+	case "superseded_by":
+		fm.SupersededBy = scalar
 	case "blocks":
 		fm.Blocks = list
 	case "blocked_by":
@@ -234,6 +255,9 @@ func Slug(title string) string {
 func New(notesDir, typ, title, area string) (*Note, error) {
 	if !validType(typ) {
 		return nil, fmt.Errorf("invalid type %q, must be one of %v", typ, Types)
+	}
+	if typ == "spec" {
+		return nil, fmt.Errorf("specs live under specs/<capability>/, not notes/ — use `chron spec new` instead")
 	}
 	slug := Slug(title)
 	if slug == "" {

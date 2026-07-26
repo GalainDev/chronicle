@@ -13,17 +13,22 @@ import (
 const (
 	dirName        = ".chronicle"
 	notesSubdir    = "notes"
+	specsSubdir    = "specs"
 	envVault       = "CHRONICLE_VAULT"
 	defaultGlobal  = "chronicle-vault"
 	registryEnv    = "CHRONICLE_REGISTRY"
 	registryRelDir = "chron"
 )
 
-// Vault is a resolved Chronicle vault: a directory containing a notes/ tree.
+// Vault is a resolved Chronicle vault: a directory containing a notes/ tree
+// and, for per-repo vaults, a specs/ tree (spec-driven dev is repo-scoped —
+// the global vault has no meaningful use for it, but nothing stops it from
+// existing there too).
 type Vault struct {
 	Name     string // registry name, used in cross-vault links as "name:path/to/note"
 	Root     string // directory containing notes/ (the .chronicle dir, or the vault repo root)
 	NotesDir string
+	SpecsDir string
 }
 
 // Resolve finds the vault that applies to cwd: the nearest ancestor
@@ -42,6 +47,7 @@ func Resolve(cwd string) (*Vault, error) {
 				Name:     filepath.Base(dir),
 				Root:     candidate,
 				NotesDir: filepath.Join(candidate, notesSubdir),
+				SpecsDir: filepath.Join(candidate, specsSubdir),
 			}, nil
 		}
 		parent := filepath.Dir(dir)
@@ -69,6 +75,7 @@ func globalVault() (*Vault, error) {
 		Name:     defaultGlobal,
 		Root:     root,
 		NotesDir: filepath.Join(root, notesSubdir),
+		SpecsDir: filepath.Join(root, specsSubdir),
 	}, nil
 }
 
@@ -94,6 +101,7 @@ func Init(root, name string) (*Vault, error) {
 		Name:     name,
 		Root:     root,
 		NotesDir: notesDir,
+		SpecsDir: filepath.Join(root, specsSubdir),
 	}, nil
 }
 
