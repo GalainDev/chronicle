@@ -15,6 +15,8 @@ notes/
   references/<slug>.md
   preferences/<slug>.md
   projects/<slug>.md
+specs/                   # per-repo only, see "Spec-driven development" below
+  <capability>/v<N>-<slug>.md
 ```
 
 One concept per file. The filename is a slug of the title; the id used by
@@ -44,12 +46,15 @@ close_reason: ""
 
 | Field | Applies to | Meaning |
 |---|---|---|
-| `type` | all, required | `decision \| task \| runbook \| reference \| preference \| project` |
+| `type` | all, required | `decision \| task \| runbook \| reference \| preference \| project \| spec` |
+| `capability` | `spec` | which capability this version belongs to; must match its directory name |
 | `area` | all, optional | `work \| study \| personal` — filterable, not structural |
 | `tags` | all, optional | free-form |
 | `status` | `task` | `open \| in_progress \| blocked \| done \| deferred` |
+| `status` | `spec` | `proposed \| implemented \| superseded` |
 | `priority` | `task` | `0`–`3` |
 | `blocks` / `blocked_by` | `task` | note ids; dependency edges |
+| `supersedes` / `superseded_by` | any type, chain-resolved only for `spec` | note id this replaces / was replaced by. Defined generally — a `decision` may use it narratively — but `chron` only walks the chain for `spec`, since only `spec` has `capability` as an unambiguous grouping key |
 | `created` / `updated` / `closed` | all | RFC 3339 timestamps |
 | `close_reason` | `task` | free text, set on `chron done --reason` |
 
@@ -68,6 +73,33 @@ There is no separate database. A task is a note like any other:
 computes the ready queue by scanning frontmatter (no shared index file to
 corrupt under concurrent writers — every task is its own file, so parallel
 agents writing different tasks never conflict at the git level).
+
+## Spec-driven development
+
+`specs/<capability>/v<N>-<slug>.md` is a per-repo, capability-scoped
+**ledger**, not a mutable document: a capability's spec is never rewritten
+once `status: implemented`. A later requirements change creates a new
+version (`chron spec revise`) that supersedes it — each version is a full,
+self-contained snapshot of the requirements plus a short note on what
+changed and why, not a delta against the previous version.
+
+- `chron spec new <capability> "<title>"` — start v1, `status: proposed`.
+- `chron spec implement <capability>` — freeze the current tip; content is
+  immutable from here (a metadata-only status flip, not a content edit).
+- `chron spec revise <capability> "<title>"` — new version superseding the
+  current tip, whatever its status. The old tip's content is never
+  touched, only `status`/`superseded_by` metadata.
+- `chron spec current <capability>` — resolve the tip (no `superseded_by`).
+- `chron spec history <capability>` — every version, oldest to newest.
+
+A `proposed` spec **is** the implementation plan — there is no separate
+task/change-tracking artifact for spec-driven repo work. `type: task`
+still exists for second-brain use (personal to-dos, study progress), just
+not as the mechanism once a capability has a spec.
+
+`specs/` lives only in per-repo vaults, never in a global vault — specs
+describe a specific codebase's requirements, not durable cross-project
+knowledge.
 
 ## One-directional graduation
 
