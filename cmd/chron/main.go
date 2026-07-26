@@ -15,6 +15,7 @@ import (
 
 	"github.com/GalainDev/chronicle/internal/lint"
 	"github.com/GalainDev/chronicle/internal/note"
+	"github.com/GalainDev/chronicle/internal/spec"
 	"github.com/GalainDev/chronicle/internal/vault"
 )
 
@@ -44,6 +45,8 @@ func main() {
 		err = cmdLint(args)
 	case "search":
 		err = cmdSearch(args)
+	case "spec":
+		err = cmdSpec(args)
 	case "-h", "--help", "help":
 		usage()
 		return
@@ -72,6 +75,13 @@ Usage:
   chron link <a> <b>                  add a bidirectional [[wiki-link]] between two notes
   chron lint [--json]                 validate frontmatter, links, orphans
   chron search <query> [--json]       full-text search (ripgrep-backed)
+
+  chron spec new <capability> "<title>" [--area a]      start a capability's spec (v1, proposed)
+  chron spec revise <capability> "<title>" [--area a]   new version superseding the current tip
+  chron spec implement <capability>                     freeze the current tip as implemented
+  chron spec current <capability> [--json]              show the current tip
+  chron spec history <capability> [--json]              show every version, oldest to newest
+  chron spec list [--json]                               list capabilities and their current status
 `)
 }
 
@@ -351,6 +361,139 @@ func cmdLink(args []string) error {
 	}
 	fmt.Printf("linked %s <-> %s\n", a.ID, b.ID)
 	return note.UpdateIndex(v.NotesDir)
+}
+
+// --- spec ---
+
+func cmdSpec(args []string) error {
+	if len(args) < 1 {
+		return fmt.Errorf("usage: chron spec <new|revise|implement|current|history|list> ...")
+	}
+	sub, rest := args[0], args[1:]
+	switch sub {
+	case "new":
+		return cmdSpecNew(rest)
+	case "revise":
+		return cmdSpecRevise(rest)
+	case "implement":
+		return cmdSpecImplement(rest)
+	case "current":
+		return cmdSpecCurrent(rest)
+	case "history":
+		return cmdSpecHistory(rest)
+	case "list":
+		return cmdSpecList(rest)
+	default:
+		return fmt.Errorf("chron spec: unknown subcommand %q", sub)
+	}
+}
+
+func cmdSpecNew(args []string) error {
+	area, args := flagValue(args, "area")
+	if len(args) < 2 {
+		return fmt.Errorf(`usage: chron spec new <capability> "<title>" [--area work|study|personal]`)
+	}
+	capability, title := args[0], strings.Join(args[1:], " ")
+	v, err := vault.Resolve(".")
+	if err != nil {
+		return err
+	}
+	n, err := spec.New(v.SpecsDir, capability, title, area)
+	if err != nil {
+		return err
+	}
+	fmt.Println(n.Path)
+	return nil
+}
+
+func cmdSpecRevise(args []string) error {
+	area, args := flagValue(args, "area")
+	if len(args) < 2 {
+		return fmt.Errorf(`usage: chron spec revise <capability> "<title>" [--area work|study|personal]`)
+	}
+	capability, title := args[0], strings.Join(args[1:], " ")
+	v, err := vault.Resolve(".")
+	if err != nil {
+		return err
+	}
+	n, err := spec.Revise(v.SpecsDir, capability, title, area)
+	if err != nil {
+		return err
+	}
+	fmt.Println(n.Path)
+	return nil
+}
+
+func cmdSpecImplement(args []string) error {
+	if len(args) < 1 {
+		return fmt.Errorf("usage: chron spec implement <capability>")
+	}
+	v, err := vault.Resolve(".")
+	if err != nil {
+		return err
+	}
+	n, err := spec.Implement(v.SpecsDir, args[0])
+	if err != nil {
+		return err
+	}
+	fmt.Printf("implemented %s (%s)\n", args[0], n.ID)
+	return nil
+}
+
+func cmdSpecCurrent(args []string) error {
+	asJSON, args := hasFlag(args, "json")
+	if len(args) < 1 {
+		return fmt.Errorf("usage: chron spec current <capability> [--json]")
+	}
+	v, err := vault.Resolve(".")
+	if err != nil {
+		return err
+	}
+	n, err := spec.Current(v.SpecsDir, args[0])
+	if err != nil {
+		return err
+	}
+	return printNotes([]*note.Note{n}, asJSON)
+}
+
+func cmdSpecHistory(args []string) error {
+	asJSON, args := hasFlag(args, "json")
+	if len(args) < 1 {
+		return fmt.Errorf("usage: chron spec history <capability> [--json]")
+	}
+	v, err := vault.Resolve(".")
+	if err != nil {
+		return err
+	}
+	hist, err := spec.History(v.SpecsDir, args[0])
+	if err != nil {
+		return err
+	}
+	if len(hist) == 0 {
+		return fmt.Errorf("no spec found for capability %q", args[0])
+	}
+	return printNotes(hist, asJSON)
+}
+
+func cmdSpecList(args []string) error {
+	asJSON, _ := hasFlag(args, "json")
+	v, err := vault.Resolve(".")
+	if err != nil {
+		return err
+	}
+	caps, err := spec.Capabilities(v.SpecsDir)
+	if err != nil {
+		return err
+	}
+	tips := make([]*note.Note, 0, len(caps))
+	for _, c := range caps {
+		n, err := spec.Current(v.SpecsDir, c)
+		if err != nil {
+			return err
+		}
+		tips = append(tips, n)
+	}
+	return printNotes(tips, asJSON)
 }
 
 // --- lint ---
