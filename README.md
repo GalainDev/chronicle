@@ -51,5 +51,5 @@ is what lets `[[vaultname:path]]` links resolve across vaults.
 ## Sibling repos
 
 - [`chronicle-vault`](https://github.com/GalainDev/chronicle-vault) (private) — the actual notes
-- [`AI`](https://github.com/GalainDev/AI) — harness (skills/hooks/mcp for Claude Code + Codex)
+- `AI` (private) — harness (skills/hooks/mcp for Claude Code + Codex)
 - [`dotfiles`](https://github.com/GalainDev/dotfiles) — the machine
